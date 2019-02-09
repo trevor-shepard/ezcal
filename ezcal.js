@@ -72,7 +72,6 @@ class Month {
             week.classList.add(`week`)
             for (let dIndex = 0; dIndex < 7; dIndex++) {
                 day = this.days[(7 * wIndex) + dIndex]
-                console.log(day)
                 week.appendChild(day.paintDay()) 
             }
             this.el.appendChild(week)
@@ -132,6 +131,22 @@ class Month {
             this.daysInMonths[1] = 29
         }
         
+    }
+
+}
+
+class Calender {
+    constructor(el) {
+        this.el = el
+
+
+        this.today = new Date()
+        this.startofMonth = new Date(this.today.getFullYear(), this.today.getMonth(), 1)
+        this.currMonth = new Month(this.today)
+
+        this.loadNextMonth = this.loadNextMonth.bind(this)
+        this.loadPreviousMonth = this.loadPreviousMonth.bind(this)
+
         this.months = {
             0: "January",
             1: "Febuary",
@@ -146,17 +161,61 @@ class Month {
             10: "November",
             11: "December"
         }
-        
+        this.constructEl.call(this)
     }
 
-}
 
-class Calender {
-    constructor(el) {
-        this.el = el
-        this.today = new Date()
-        this.currMonth = new Month(this.today)
+    constructEl(){
+        // create container for buttons and title
+        this.tilebar = document.createElement('div')
+        this.tilebar.classList.add("ezCal-titlebar")
+
+
+        // create next month button
+        this.nextMonthButton = document.createElement('button')
+        this.nextMonthButton.innerText = 'next'
+        this.nextMonthButton.classList = 'ez-cal-button'
+        this.nextMonthButton.addEventListener('click', this.loadNextMonth)
+        this.tilebar.appendChild(this.nextMonthButton)
+
+        // create header with current month
+        this.title = document.createElement('h3')
+        this.title.innerText = `${this.months[this.startofMonth.getMonth()]} ${this.startofMonth.getFullYear()}`
+
+        // create previous mont buttons
+        this.previousMonthButton = document.createElement('button')
+        this.previousMonthButton.classList = 'ez-cal-button'
+        this.previousMonthButton.innerText = "prev"
+        this.previousMonthButton.addEventListener('click', this.loadPreviousMonth)
+        this.tilebar.appendChild(this.previousMonthButton)
+
+        // construct element 
+        this.el.innerHTML = ""
+        this.el.appendChild(this.title)
+        this.el.appendChild(this.tilebar)
         this.el.appendChild(this.currMonth.paintMonth())
+
+    }
+
+    loadNextMonth() {
+        this.startofMonth = new Date(
+            this.startofMonth.getMonth() === 11 ? this.startofMonth.getFullYear() + 1 : this.startofMonth.getFullYear(),
+            this.startofMonth.getMonth() === 11 ? 0 : this.startofMonth.getMonth() + 1,
+            1)
+        
+        this.currMonth = new Month(this.startofMonth)
+
+        this.constructEl()
+    }
+
+    loadPreviousMonth() {
+        this.startofMonth = new Date(
+            this.startofMonth.getMonth() === 0 ? this.startofMonth.getFullYear() - 1 : this.startofMonth.getFullYear(),
+            this.startofMonth.getMonth() === 0 ? 11 : this.startofMonth.getMonth() - 1,
+            1)
+        this.currMonth = new Month(this.startofMonth)
+
+        this.constructEl()
     }
 
     
@@ -167,4 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let ezCal = document.getElementById('ez-cal')
     
     let cal = new Calender(ezCal)
+    
+    
 })
