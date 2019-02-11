@@ -18,6 +18,7 @@
 .day {
     height: 30px;
     width: 30px;
+    position: relative;
 }
 
 .ezCal-titlebar {
@@ -32,4 +33,32 @@
 .ez-cal-button{
     height: 30%;
     margin: 5%;
+}
+
+.title-list {
+    position: absolute;
+    min-width: 140px;
+    height: auto;
+    z-index: -1;
+    background: white;
+    border: 1px solid;
+    border-radius: 4px;
+    padding: 5px;
+    list-style-type: none;
+    display: none
+}
+
+.mounted {
+    cursor: pointer;
+}
+
+.day:hover .title-list {
+    z-index: 2;
+    display: inline;
+}
+
+.title-list li {
+    list-style: none;
+    left: -21px;
+    top: 3px;
 }

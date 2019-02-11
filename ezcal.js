@@ -34,7 +34,7 @@ class Day {
     paintDay() {
         this.el = document.createElement('div')
         this.el.classList.add("day")
-        this.el.id = `${this.month}-${this.day}-${this.year}`
+        this.el.id = this.date.toLocaleDateString()
         this.el.innerText = this.day
         return this.el
     }
@@ -139,6 +139,8 @@ class Calender {
     constructor(el) {
         this.el = el
 
+        this.events = {}
+        this.clickEvents = {}
 
         this.today = new Date()
         this.startofMonth = new Date(this.today.getFullYear(), this.today.getMonth(), 1)
@@ -146,7 +148,10 @@ class Calender {
 
         this.loadNextMonth = this.loadNextMonth.bind(this)
         this.loadPreviousMonth = this.loadPreviousMonth.bind(this)
-
+        this.addClick = this.addClick.bind(this)
+        this.addTitle = this.addTitle.bind(this)
+        this.mountTitles = this.mountTitles.bind(this)
+       
         this.months = {
             0: "January",
             1: "Febuary",
@@ -218,14 +223,71 @@ class Calender {
         this.constructEl()
     }
 
-    
+    // build library of titles for display of current month
+    addTitle(day, title){
+        if (this.events[day.toLocaleDateString()]) {
+            this.events[day.toLocaleDateString()].push(title)
+        } else {
+            
+
+            this.events[day.toLocaleDateString()] = [title]
+        }
+    }
+
+    // mount display divs to display on days on hover
+    mountTitles() {
+        this.currMonth.days.forEach(day => {
+            
+            if (this.events[day.date.toLocaleDateString()]) {
+                let titleList = document.createElement('ul')
+                titleList.classList.add('title-list')
+                this.events[day.date.toLocaleDateString()].forEach(title => {
+                    let titleEl = document.createElement('li')
+                    titleEl.innerText = title
+                    titleList.appendChild(titleEl)
+                })
+                let dayEl = document.getElementById(day.date.toLocaleDateString())
+                dayEl.appendChild(titleList)
+                
+                
+            }
+        })
+    }
+
+    // add callback to onClick of day 
+    addClick(day, callback){
+
+        let dayEl = document.getElementById(day.toLocaleDateString())
+        dayEl.addEventListener('click', callback)
+        dayEl.classList.add('mounted')
+        this.clickEvents[day.getUTCDate()] = callback
+    }
+
 }
 
+// sample calender setup
+// document.addEventListener("DOMContentLoaded", () => {
+//     let ezCal = document.getElementById('ez-cal')
+    
+//     let cal = new Calender(ezCal)
 
-document.addEventListener("DOMContentLoaded", () => {
-    let ezCal = document.getElementById('ez-cal')
+//     const exampleCallback = () => {
+//         window.alert("EVENT")
+//     }
+
+//     let today = new Date();
+//     let tomorrow = new Date();
+//     tomorrow.setDate(today.getDate()+1);
     
-    let cal = new Calender(ezCal)
+//     cal.addTitle(today, "my first title")
+//     cal.addTitle(today, "my second title")
+//     cal.addClick(today, exampleCallback)
+
     
+//     cal.addTitle(tomorrow, "my third title")
+//     cal.addTitle(tomorrow, "my fourth title")
+//     cal.addClick(tomorrow, exampleCallback)
+
     
-})
+//     cal.mountTitles()
+// })
