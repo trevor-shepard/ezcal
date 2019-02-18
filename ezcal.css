@@ -19,6 +19,10 @@
     height: 30px;
     width: 30px;
     position: relative;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 30px;
+    margin: 10px;
 }
 
 .ezCal-titlebar {
@@ -37,15 +41,18 @@
 
 .title-list {
     position: absolute;
-    min-width: 140px;
+    min-width: 300px;
     height: auto;
-    z-index: -1;
+    z-index: 2;
     background: white;
     border: 1px solid;
     border-radius: 4px;
     padding: 5px;
     list-style-type: none;
-    display: none
+    display: none;
+    color: black;
+    line-height: 15px;
+    font-size: .8rem;
 }
 
 .mounted {
@@ -61,4 +68,11 @@
     list-style: none;
     left: -21px;
     top: 3px;
+}
+
+.mounted {
+    color: white;
+    background-color: #003073;
+    border-radius: 37px;
+    cursor: pointer;
 }

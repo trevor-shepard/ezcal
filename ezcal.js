@@ -150,7 +150,7 @@ class Calender {
         this.loadPreviousMonth = this.loadPreviousMonth.bind(this)
         this.addClick = this.addClick.bind(this)
         this.addTitle = this.addTitle.bind(this)
-        this.mountTitles = this.mountTitles.bind(this)
+        this.mountDays = this.mountDays.bind(this)
        
         this.months = {
             0: "January",
@@ -176,16 +176,9 @@ class Calender {
         this.tilebar.classList.add("ezCal-titlebar")
 
 
-        // create next month button
-        this.nextMonthButton = document.createElement('button')
-        this.nextMonthButton.innerText = 'next'
-        this.nextMonthButton.classList = 'ez-cal-button'
-        this.nextMonthButton.addEventListener('click', this.loadNextMonth)
-        this.tilebar.appendChild(this.nextMonthButton)
+        
 
-        // create header with current month
-        this.title = document.createElement('h3')
-        this.title.innerText = `${this.months[this.startofMonth.getMonth()]} ${this.startofMonth.getFullYear()}`
+        
 
         // create previous mont buttons
         this.previousMonthButton = document.createElement('button')
@@ -194,9 +187,20 @@ class Calender {
         this.previousMonthButton.addEventListener('click', this.loadPreviousMonth)
         this.tilebar.appendChild(this.previousMonthButton)
 
+        // create header with current month
+        this.title = document.createElement('h3')
+        this.title.innerText = `${this.months[this.startofMonth.getMonth()]} ${this.startofMonth.getFullYear()}`
+        this.tilebar.appendChild(this.title)
+
+        // create next month button
+        this.nextMonthButton = document.createElement('button')
+        this.nextMonthButton.innerText = 'next'
+        this.nextMonthButton.classList = 'ez-cal-button'
+        this.nextMonthButton.addEventListener('click', this.loadNextMonth)
+        this.tilebar.appendChild(this.nextMonthButton)
+
         // construct element 
         this.el.innerHTML = ""
-        this.el.appendChild(this.title)
         this.el.appendChild(this.tilebar)
         this.el.appendChild(this.currMonth.paintMonth())
 
@@ -228,15 +232,20 @@ class Calender {
         if (this.events[day.toLocaleDateString()]) {
             this.events[day.toLocaleDateString()].push(title)
         } else {
-            
-
             this.events[day.toLocaleDateString()] = [title]
         }
     }
 
+    // add callback to onClick of day 
+    addClick(day, callback){
+        this.clickEvents[day.toLocaleDateString()] = callback 
+        
+    }
+
     // mount display divs to display on days on hover
-    mountTitles() {
+    mountDays() {
         this.currMonth.days.forEach(day => {
+            let dayEl
             
             if (this.events[day.date.toLocaleDateString()]) {
                 let titleList = document.createElement('ul')
@@ -246,48 +255,45 @@ class Calender {
                     titleEl.innerText = title
                     titleList.appendChild(titleEl)
                 })
-                let dayEl = document.getElementById(day.date.toLocaleDateString())
+                dayEl = document.getElementById(day.date.toLocaleDateString())
                 dayEl.appendChild(titleList)
+                dayEl.classList.add("event-day")
+            }
+            
+            if (this.clickEvents[day.date.toLocaleDateString()]) {
+                let dayEl = document.getElementById(day.date.toLocaleDateString())
                 
-                
+                dayEl.addEventListener('click', this.clickEvents[day.date.toLocaleDateString()])
+                dayEl.classList.add('mounted')
             }
         })
-    }
-
-    // add callback to onClick of day 
-    addClick(day, callback){
-
-        let dayEl = document.getElementById(day.toLocaleDateString())
-        dayEl.addEventListener('click', callback)
-        dayEl.classList.add('mounted')
-        this.clickEvents[day.getUTCDate()] = callback
     }
 
 }
 
 // sample calender setup
-// document.addEventListener("DOMContentLoaded", () => {
-//     let ezCal = document.getElementById('ez-cal')
+document.addEventListener("DOMContentLoaded", () => {
+    let ezCal = document.getElementById('ez-cal')
     
-//     let cal = new Calender(ezCal)
+    let cal = new Calender(ezCal)
 
-//     const exampleCallback = () => {
-//         window.alert("EVENT")
-//     }
+    const exampleCallback = () => {
+        window.alert("EVENT")
+    }
 
-//     let today = new Date();
-//     let tomorrow = new Date();
-//     tomorrow.setDate(today.getDate()+1);
+    let today = new Date();
+    let tomorrow = new Date();
+    tomorrow.setDate(today.getDate()+1);
     
-//     cal.addTitle(today, "my first title")
-//     cal.addTitle(today, "my second title")
-//     cal.addClick(today, exampleCallback)
-
-    
-//     cal.addTitle(tomorrow, "my third title")
-//     cal.addTitle(tomorrow, "my fourth title")
-//     cal.addClick(tomorrow, exampleCallback)
+    cal.addTitle(today, "my first title")
+    cal.addTitle(today, "my second title")
+    cal.addClick(today, exampleCallback)
 
     
-//     cal.mountTitles()
-// })
+    cal.addTitle(tomorrow, "my third title")
+    cal.addTitle(tomorrow, "my fourth title")
+    cal.addClick(tomorrow, exampleCallback)
+
+    
+    cal.mountDays()
+})
