@@ -1,29 +1,7 @@
-class CssRule  {
-    constructor(sheetName) {
-        this.styleSheet
-        for (let styleSheet of document.styleSheets) {
-            if (styleSheet.href.includes(sheetName)) {
-                this.styleSheet = styleSheet
-            }
-        }
-        this.adjust = this.adjust.bind(this)
-    }
-
-    adjust(cssIdentifyer, changeStyle, changeValue) {
-        
-        for (let rule of this.styleSheet.rules) {
-            if (rule.selectorText === cssIdentifyer) {
-                rule.style[changeStyle] = changeValue;
-            }
-        }
-    }
-}
-
-
-
-
 class Day {
-    constructor(year, month, day) {
+    constructor(year, month, day, current) {
+        
+        this.current = current ? true : false
         this.month = month
         this.day = day
         this.year = year
@@ -35,7 +13,15 @@ class Day {
         this.el = document.createElement('div')
         this.el.classList.add("day")
         this.el.id = this.date.toLocaleDateString()
-        this.el.innerText = this.day
+
+        // able to turn off if desirable to show previous/next month dates
+        this.el.innerText = this.current ? this.day : ""
+        let today = new Date();
+        let yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+        if (this.date < yesterday) {
+            this.el.classList.add('past')
+        } 
         return this.el
     }
 
@@ -72,7 +58,7 @@ class Month {
             week.classList.add(`week`)
             for (let dIndex = 0; dIndex < 7; dIndex++) {
                 day = this.days[(7 * wIndex) + dIndex]
-                week.appendChild(day.paintDay()) 
+                week.appendChild(day.paintDay())
             }
             this.el.appendChild(week)
         }
@@ -91,16 +77,16 @@ class Month {
         this.days = []
         // Get previous month lapover days
         for (let index = 0; index < this.startofMonth.getDay(); index++) {
-            this.days.unshift(new Day(this.lastMonthYear, this.lastMonth, this.daysInMonths[this.lastMonth] - index))
+            this.days.unshift(new Day(this.lastMonthYear, this.lastMonth, this.daysInMonths[this.lastMonth] - index, false))
         }
         // Get current months days
         for (let index = 1; index < (this.daysInMonths[date.getMonth()] + 1); index++) {
-            this.days.push(new Day(date.getFullYear(), date.getMonth(), index))
+            this.days.push(new Day(date.getFullYear(), date.getMonth(), index, true))
         }
         // Get next month lapover days
         
         for (let index = 0; index < 6 - (this.endofMonth.getDay()); index++) {
-            this.days.push(new Day(this.nextMonthYear, this.nextMonth, index + 1))
+            this.days.push(new Day(this.nextMonthYear, this.nextMonth, index + 1, false))
         }
     }
 
@@ -215,6 +201,8 @@ class Calender {
         this.currMonth = new Month(this.startofMonth)
 
         this.constructEl()
+
+        this.mountDays()
     }
 
     loadPreviousMonth() {
@@ -225,6 +213,9 @@ class Calender {
         this.currMonth = new Month(this.startofMonth)
 
         this.constructEl()
+
+        this.mountDays()
+        
     }
 
     // build library of titles for display of current month
@@ -271,29 +262,25 @@ class Calender {
 
 }
 
-// sample calender setup
-document.addEventListener("DOMContentLoaded", () => {
-    let ezCal = document.getElementById('ez-cal')
-    
-    let cal = new Calender(ezCal)
 
-    const exampleCallback = () => {
-        window.alert("EVENT")
+
+class CssRule  {
+    constructor(sheetName) {
+        this.styleSheet
+        for (let styleSheet of document.styleSheets) {
+            if (styleSheet.href.includes(sheetName)) {
+                this.styleSheet = styleSheet
+            }
+        }
+        this.adjust = this.adjust.bind(this)
     }
 
-    let today = new Date();
-    let tomorrow = new Date();
-    tomorrow.setDate(today.getDate()+1);
-    
-    cal.addTitle(today, "my first title")
-    cal.addTitle(today, "my second title")
-    cal.addClick(today, exampleCallback)
-
-    
-    cal.addTitle(tomorrow, "my third title")
-    cal.addTitle(tomorrow, "my fourth title")
-    cal.addClick(tomorrow, exampleCallback)
-
-    
-    cal.mountDays()
-})
+    adjust(cssIdentifyer, changeStyle, changeValue) {
+        
+        for (let rule of this.styleSheet.rules) {
+            if (rule.selectorText === cssIdentifyer) {
+                rule.style[changeStyle] = changeValue;
+            }
+        }
+    }
+}
